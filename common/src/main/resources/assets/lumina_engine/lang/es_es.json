@@ -34,5 +34,20 @@
   "lumina_engine.telemetry.frame_time": "Tiempo de frame: %s ms promedio / %s ms p95",
   "lumina_engine.telemetry.status.warming_up": "Monitor de rendimiento: calentando (objetivo %s FPS)",
   "lumina_engine.telemetry.status.meeting_target": "Monitor de rendimiento: cumple el objetivo de %s FPS",
-  "lumina_engine.telemetry.status.below_target": "Monitor de rendimiento: por debajo del objetivo de %s FPS"
+  "lumina_engine.telemetry.status.below_target": "Monitor de rendimiento: por debajo del objetivo de %s FPS",
+  "lumina_engine.recommendation": "Recomendación: %s",
+  "lumina_engine.recommendation.reason": "Motivo: %s",
+  "lumina_engine.recommendation.raise_quality": "Subir la calidad un nivel",
+  "lumina_engine.recommendation.hold": "Mantener la calidad actual",
+  "lumina_engine.recommendation.lower_quality": "Bajar la calidad un nivel",
+  "lumina_engine.recommendation.reason.warming_up": "Recopilando suficientes muestras estables",
+  "lumina_engine.recommendation.reason.performance_stable": "El rendimiento estable está dentro de la banda de histéresis",
+  "lumina_engine.recommendation.reason.observing_low_performance": "Confirmando rendimiento inferior al 90 % del objetivo",
+  "lumina_engine.recommendation.reason.observing_headroom": "Confirmando margen sostenido por encima del objetivo",
+  "lumina_engine.recommendation.reason.sustained_low_performance": "Los FPS mínimos estables permanecieron bajo el 90 % del objetivo",
+  "lumina_engine.recommendation.reason.sustained_headroom": "Los FPS mínimos estables permanecieron sobre el 110 % del objetivo",
+  "lumina_engine.recommendation.reason.cooldown": "Esperando el tiempo de enfriamiento de la recomendación",
+  "lumina_engine.recommendation.reason.quality_floor": "Performance ya es el perfil de calidad más bajo",
+  "lumina_engine.recommendation.reason.quality_ceiling": "Cinematic ya es el perfil de calidad más alto",
+  "lumina_engine.recommendation.reason.custom_profile": "Las recomendaciones no cambian perfiles personalizados"
 }

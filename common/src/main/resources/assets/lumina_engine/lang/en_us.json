@@ -34,5 +34,20 @@
   "lumina_engine.telemetry.frame_time": "Frame time: %s ms average / %s ms p95",
   "lumina_engine.telemetry.status.warming_up": "Performance monitor: warming up (target %s FPS)",
   "lumina_engine.telemetry.status.meeting_target": "Performance monitor: meeting %s FPS target",
-  "lumina_engine.telemetry.status.below_target": "Performance monitor: below %s FPS target"
+  "lumina_engine.telemetry.status.below_target": "Performance monitor: below %s FPS target",
+  "lumina_engine.recommendation": "Recommendation: %s",
+  "lumina_engine.recommendation.reason": "Reason: %s",
+  "lumina_engine.recommendation.raise_quality": "Raise quality one level",
+  "lumina_engine.recommendation.hold": "Hold current quality",
+  "lumina_engine.recommendation.lower_quality": "Lower quality one level",
+  "lumina_engine.recommendation.reason.warming_up": "Collecting enough stable samples",
+  "lumina_engine.recommendation.reason.performance_stable": "Stable performance is inside the hysteresis band",
+  "lumina_engine.recommendation.reason.observing_low_performance": "Confirming performance below 90% of target",
+  "lumina_engine.recommendation.reason.observing_headroom": "Confirming sustained headroom above target",
+  "lumina_engine.recommendation.reason.sustained_low_performance": "Stable minimum FPS stayed below 90% of target",
+  "lumina_engine.recommendation.reason.sustained_headroom": "Stable minimum FPS stayed above 110% of target",
+  "lumina_engine.recommendation.reason.cooldown": "Waiting for the recommendation cooldown",
+  "lumina_engine.recommendation.reason.quality_floor": "Performance is already the lowest quality profile",
+  "lumina_engine.recommendation.reason.quality_ceiling": "Cinematic is already the highest quality profile",
+  "lumina_engine.recommendation.reason.custom_profile": "Custom profiles are not changed by recommendations"
 }

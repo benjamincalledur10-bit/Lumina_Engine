@@ -1,0 +1,14 @@
+package dev.lumina.engine.common.adaptive;
+
+public enum RecommendationReason {
+    WARMING_UP,
+    PERFORMANCE_STABLE,
+    OBSERVING_LOW_PERFORMANCE,
+    OBSERVING_HEADROOM,
+    SUSTAINED_LOW_PERFORMANCE,
+    SUSTAINED_HEADROOM,
+    COOLDOWN,
+    QUALITY_FLOOR,
+    QUALITY_CEILING,
+    CUSTOM_PROFILE
+}

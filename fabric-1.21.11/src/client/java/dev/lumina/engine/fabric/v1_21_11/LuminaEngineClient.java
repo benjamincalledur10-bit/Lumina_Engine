@@ -17,10 +17,12 @@ public final class LuminaEngineClient implements ClientModInitializer {
         FabricPlatformAdapter platform = new FabricPlatformAdapter();
         ConfigStore configStore = new ConfigStore(platform.configDirectory().resolve(MOD_ID + ".json"));
         int targetFps = LuminaConfig.DEFAULT_TARGET_FPS;
+        var profile = dev.lumina.engine.common.QualityProfile.BALANCED;
 
         try {
             ConfigStore.LoadResult result = configStore.load();
             targetFps = result.config().targetFps();
+            profile = result.config().profile();
             if (result.recoveredFromCorruption()) {
                 LOGGER.warn("Recovered corrupt configuration; backup saved to {}", result.corruptBackup());
             }
@@ -34,7 +36,7 @@ public final class LuminaEngineClient implements ClientModInitializer {
             LOGGER.error("Could not load Lumina Engine configuration; using in-memory defaults", exception);
         }
 
-        FrameTelemetryRuntime.initialize(targetFps);
+        FrameTelemetryRuntime.initialize(targetFps, profile);
 
         Diagnostics.inspect(platform).mods().forEach(status ->
             LOGGER.info("Dependency diagnostic: {} ({})", status.displayName(), status.version())

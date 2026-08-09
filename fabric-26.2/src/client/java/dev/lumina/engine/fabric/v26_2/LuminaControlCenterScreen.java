@@ -16,6 +16,7 @@ import dev.lumina.engine.common.ModStatus;
 import dev.lumina.engine.common.QualityProfile;
 import dev.lumina.engine.common.iris.IrisStatus;
 import dev.lumina.engine.common.telemetry.FrameTimeSnapshot;
+import dev.lumina.engine.common.adaptive.RecommendationResult;
 import java.io.IOException;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -81,7 +82,10 @@ final class LuminaControlCenterScreen {
         ConfigCategory.Builder diagnostics = ConfigCategory.createBuilder()
             .name(Component.translatable("lumina_engine.category.diagnostics"));
         FrameTimeSnapshot metrics = FrameTelemetryRuntime.latest();
+        RecommendationResult recommendation = FrameTelemetryRuntime.recommendation();
         diagnostics
+            .option(LabelOption.create(Component.translatable("lumina_engine.recommendation", recommendationText(recommendation))))
+            .option(LabelOption.create(Component.translatable("lumina_engine.recommendation.reason", reasonText(recommendation))))
             .option(LabelOption.create(telemetryStatusText(metrics)))
             .option(LabelOption.create(Component.translatable("lumina_engine.telemetry.average_fps", format(metrics.averageFps()))))
             .option(LabelOption.create(Component.translatable("lumina_engine.telemetry.stable_minimum_fps", format(metrics.stableMinimumFps()))))
@@ -130,6 +134,7 @@ final class LuminaControlCenterScreen {
         try {
             session.save();
             FrameTelemetryRuntime.setTargetFps(session.targetFps());
+            FrameTelemetryRuntime.setProfile(session.profile());
         } catch (IOException exception) {
             LOGGER.error("Could not save Lumina Engine configuration", exception);
         }
@@ -140,6 +145,14 @@ final class LuminaControlCenterScreen {
     }
 
     private static String format(double value) { return String.format(java.util.Locale.ROOT, "%.1f", value); }
+
+    private static Component recommendationText(RecommendationResult result) {
+        return Component.translatable("lumina_engine.recommendation." + result.recommendation().name().toLowerCase(java.util.Locale.ROOT));
+    }
+
+    private static Component reasonText(RecommendationResult result) {
+        return Component.translatable("lumina_engine.recommendation.reason." + result.reason().name().toLowerCase(java.util.Locale.ROOT));
+    }
 
     private static Component diagnosticText(ModStatus status) {
         return status.installed()

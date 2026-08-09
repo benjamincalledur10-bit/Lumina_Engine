@@ -73,6 +73,11 @@ public final class FrameTimeMonitor {
 
     public int sampleCount() { return size; }
 
+    public void reset() {
+        previousFrameNanos = Long.MIN_VALUE;
+        clearSamples();
+    }
+
     private void clearSamples() {
         size = 0;
         writeIndex = 0;
