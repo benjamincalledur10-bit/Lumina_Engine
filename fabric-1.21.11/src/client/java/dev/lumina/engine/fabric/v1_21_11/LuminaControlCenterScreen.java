@@ -18,6 +18,7 @@ import dev.lumina.engine.common.iris.IrisStatus;
 import dev.lumina.engine.common.telemetry.FrameTimeSnapshot;
 import dev.lumina.engine.common.benchmark.BenchmarkResult;
 import dev.lumina.engine.common.benchmark.BenchmarkSnapshot;
+import dev.lumina.engine.common.benchmark.BenchmarkComparison;
 import dev.lumina.engine.common.adaptive.RecommendationResult;
 import dev.lumina.engine.common.adaptive.ActionableRecommendation;
 import dev.lumina.engine.common.adaptive.QualityAdjustmentPlan;
@@ -147,6 +148,7 @@ final class LuminaControlCenterScreen {
             .option(LabelOption.create(Text.translatable("lumina_engine.telemetry.one_percent_low", format(metrics.onePercentLowFps()))))
             .option(LabelOption.create(Text.translatable("lumina_engine.telemetry.frame_time", format(metrics.averageFrameTimeMillis()), format(metrics.p95FrameTimeMillis()))));
         benchmark.result().ifPresent(result -> addBenchmarkResult(diagnostics, result));
+        FrameTelemetryRuntime.benchmarkComparison().ifPresent(comparison -> addBenchmarkComparison(diagnostics, comparison));
         for (PlannedAdjustment adjustment : plan.adjustments()) {
             diagnostics.option(LabelOption.create(adjustmentText(adjustment)));
         }
@@ -232,6 +234,14 @@ final class LuminaControlCenterScreen {
             .option(LabelOption.create(Text.translatable("lumina_engine.benchmark.result.fps", format(result.averageFps()), format(result.stableMinimumFps()), format(result.onePercentLowFps()))))
             .option(LabelOption.create(Text.translatable("lumina_engine.benchmark.result.frame_time", format(result.averageFrameTimeMillis()), format(result.p95FrameTimeMillis()))))
             .option(LabelOption.create(Text.translatable("lumina_engine.benchmark.result.target", format(result.targetMetPercent()), result.targetFps())));
+    }
+
+    private static void addBenchmarkComparison(ConfigCategory.Builder diagnostics, BenchmarkComparison value) {
+        diagnostics
+            .option(LabelOption.create(Text.translatable("lumina_engine.comparison.title", value.baseline().label(), value.candidate().label())))
+            .option(LabelOption.create(Text.translatable("lumina_engine.comparison.average", format(value.averageFpsDelta()), format(value.averageFpsPercent()))))
+            .option(LabelOption.create(Text.translatable("lumina_engine.comparison.low", format(value.onePercentLowDelta()), format(value.onePercentLowPercent()))))
+            .option(LabelOption.create(Text.translatable("lumina_engine.comparison.stability", format(value.p95FrameTimeDelta()), format(value.p95FrameTimePercent()))));
     }
 
     private static Text recommendationText(RecommendationResult result) {
