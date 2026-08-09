@@ -1,0 +1,22 @@
+plugins {
+    id 'base'
+}
+
+group = 'dev.lumina'
+version = project.mod_version
+
+allprojects {
+    repositories {
+        mavenCentral()
+        maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.isxander.dev/releases' }
+        maven { url = 'https://maven.terraformersmc.com/releases' }
+        maven { url = 'https://api.modrinth.com/maven' }
+    }
+}
+
+tasks.register('validateAll') {
+    group = 'verification'
+    description = 'Builds both Fabric targets and runs all shared unit tests.'
+    dependsOn ':common:test', ':fabric-1.21.11:build', ':fabric-26.2:build'
+}

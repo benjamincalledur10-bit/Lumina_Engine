@@ -1,0 +1,58 @@
+# Gradle
+.gradle/
+**/build/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+!gradle/wrapper/gradle-wrapper.jar
+hs_err_pid*
+replay_pid*
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Visual Studio Code
+.vscode/
+.classpath
+.project
+.settings/
+
+# Minecraft development runs
+run/
+**/run/
+runs/
+**/runs/
+logs/
+**/logs/
+crash-reports/
+**/crash-reports/
+saves/
+screenshots/
+resourcepacks/
+shaderpacks/
+config/
+mods/
+options.txt
+usercache.json
+usernamecache.json
+
+# Operating systems and editors
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem

@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "lumina_engine",
+  "version": "${version}",
+  "name": "Lumina Engine",
+  "description": "Client-side profiles, compatibility diagnostics, and adaptive foundations for the Lumina shader ecosystem.",
+  "authors": [
+    "Benjamin"
+  ],
+  "contact": {
+    "sources": "https://github.com/benjamincalledur10-bit/Lumina_Engine",
+    "issues": "https://github.com/benjamincalledur10-bit/Lumina_Engine/issues"
+  },
+  "license": "GPL-3.0-only",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.lumina.engine.fabric.v26_2.LuminaEngineClient"
+    ],
+    "modmenu": [
+      "dev.lumina.engine.fabric.v26_2.LuminaEngineModMenu"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "=26.2",
+    "java": ">=25",
+    "fabric-api": "*",
+    "yet_another_config_lib_v3": ">=3.9.6"
+  },
+  "recommends": {
+    "modmenu": ">=20.0.1",
+    "iris": "*",
+    "sodium": "*"
+  },
+  "suggests": {
+    "distanthorizons": "*"
+  }
+}

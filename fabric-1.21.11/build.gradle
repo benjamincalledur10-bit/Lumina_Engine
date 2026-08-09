@@ -1,0 +1,58 @@
+plugins {
+    id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+}
+
+version = project.mod_version
+group = project.maven_group
+base.archivesName = 'lumina-engine-fabric-1.21.11'
+
+loom {
+    splitEnvironmentSourceSets()
+
+    mods {
+        lumina_engine {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_1_21_11}"
+    mappings "net.fabricmc:yarn:${yarn_1_21_11}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_1_21_11}"
+    modImplementation "dev.isxander:yet-another-config-lib:${yacl_1_21_11}"
+    modCompileOnly "com.terraformersmc:modmenu:${modmenu_1_21_11}"
+    modCompileOnly("maven.modrinth:iris:${iris_1_21_11}") { transitive = false }
+    clientImplementation project(':common')
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') {
+        expand 'version': project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
+    options.encoding = 'UTF-8'
+    options.compilerArgs.add('-Xlint:deprecation')
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withSourcesJar()
+}
+
+jar {
+    from project(':common').sourceSets.main.output
+    from(rootProject.file('LICENSE')) {
+        rename { 'LICENSE_Lumina_Engine' }
+    }
+}
+
+sourcesJar {
+    from project(':common').sourceSets.main.allSource
+}

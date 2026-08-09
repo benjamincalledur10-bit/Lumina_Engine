@@ -1,0 +1,10 @@
+pluginManagement {
+    repositories {
+        maven { url = 'https://maven.fabricmc.net/' }
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'Lumina_Engine'
+include 'common', 'fabric-1.21.11', 'fabric-26.2'
