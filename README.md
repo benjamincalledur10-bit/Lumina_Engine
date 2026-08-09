@@ -17,7 +17,8 @@ optimizations belong in the Lumina shaders; the engine coordinates compatible
 settings and will make measured, user-authorized adjustments in future releases.
 
 > [!IMPORTANT]
-> The project is in early development. There are no stable releases yet.
+> The project is in alpha preparation. Version `0.0.1-alpha.1` is not a stable
+> release and must be tested before publication.
 
 ## Supported targets
 
@@ -41,6 +42,9 @@ unobfuscated and requires a different Loom pipeline and Java toolchain.
 - Detection of Fabric API, YACL, Mod Menu, Iris, Sodium, and Distant Horizons
 - YACL-based Lumina Control Center available through Mod Menu
 - English and Spanish interface translations
+- Local, read-only frame-time metrics with warmup and invalid-sample handling
+- Read-only adaptive quality recommendations with hysteresis and cooldowns
+- One-level quality adjustment plan previews that are never applied automatically
 - Unit tests for shared, Minecraft-independent behavior
 
 No settings are changed automatically. Lumina Engine never downloads mods or
@@ -74,7 +78,7 @@ Pinned development versions:
 | YACL | 3.8.2+1.21.11-fabric | 3.9.6+26.2-fabric | Required |
 | Mod Menu | 17.0.1-beta.1 | 20.0.1 | Recommended |
 | Iris | 1.10.7+1.21.11-fabric | 1.11.2+26.2-fabric | Recommended |
-| Sodium | mc1.21.11-0.8.14-beta.2-fabric | mc26.2-0.9.2-alpha.4-fabric | Recommended |
+| Sodium | mc1.21.11-0.8.7-fabric | mc26.2-0.9.1-fabric | Recommended |
 | Distant Horizons | Detected at runtime | Detected at runtime | Optional |
 
 Iris, Sodium, Mod Menu, and Distant Horizons are not required for startup.
@@ -99,6 +103,11 @@ Adaptive optimization is visible but deliberately unavailable. The values saved
 by this screen are configuration targets only: they do not modify Minecraft,
 Iris, Sodium, or shader settings yet.
 
+The diagnostics panel also displays local frame-time statistics, a read-only
+quality recommendation, its reason, and a preview of the next profile and
+adjustment domains. Measurements stay in memory, are never transmitted or
+stored as history, and reset when relevant client context changes.
+
 The Iris bridge uses only `net.irisshaders.iris.api.v0`. It is loaded lazily,
 so Iris remains optional, and it deliberately does not inspect Iris internals,
 shader-pack files, or the selected pack's name.
@@ -119,8 +128,13 @@ Individual targets can be built with:
 ./gradlew :common:test
 ```
 
-The distributable JARs are written to each platform module's `build/libs/`
-directory. Do not use a JAR whose filename contains `sources`.
+The two distributable JARs are written to each platform module's `build/libs/`:
+
+- `fabric-1.21.11/build/libs/lumina-engine-fabric-1.21.11-0.0.1-alpha.1.jar`
+- `fabric-26.2/build/libs/lumina-engine-fabric-26.2-0.0.1-alpha.1.jar`
+
+Files whose names contain `sources` are development artifacts and must not be
+installed. Iris and Sodium are optional external mods and are not bundled.
 
 ## Configuration
 
@@ -129,12 +143,21 @@ file cannot be parsed or contains invalid values, it is preserved with a
 `.corrupt` suffix and replaced with safe defaults. Configuration writes use a
 temporary file and an atomic move whenever the filesystem supports it.
 
-## Roadmap boundaries
+## Alpha limitations
 
-Automatic option changes, benchmarking, shader uniforms, direct shader
-integration, frame-time measurement, and adaptive FPS control are not part of
-the current implementation. Future integrations must use stable APIs or an
-isolated compatibility layer—never copied internals or fragile private hooks.
+- Recommendations and adjustment plans are informational only; adaptive mode
+  remains disabled and cannot apply them.
+- Lumina Engine does not alter Minecraft, Iris, Sodium, Distant Horizons, or
+  shader settings.
+- Event Horizon and Lumina Lite are not identified by name and have no direct
+  integration yet because the public Iris API does not expose the selected
+  shader-pack name.
+- There is no benchmark, automatic tuning, shader uniform control, telemetry,
+  persistent performance history, or real-client automated smoke test yet.
+- A failed configuration write is reported in the log, not in the UI.
+
+Future integrations must use stable APIs or an isolated compatibility
+layer—never copied internals or fragile private hooks.
 
 ## Contributing
 
@@ -147,3 +170,5 @@ Lumina Engine is licensed under the [GNU General Public License v3.0](LICENSE).
 
 Minecraft is a trademark of Microsoft Corporation. This project is not
 affiliated with or endorsed by Microsoft or Mojang Studios.
+
+Release history is documented in [CHANGELOG.md](CHANGELOG.md).
