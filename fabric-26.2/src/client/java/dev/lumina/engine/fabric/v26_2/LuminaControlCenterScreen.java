@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.time.Instant;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,7 +219,9 @@ final class LuminaControlCenterScreen {
                 .text(Component.translatable("lumina_engine.action.open_iris"))
                 .available(irisStatus.installed())
                 .action((screen, option) -> iris.openShaderScreen(screen))
-                .build());
+                .build())
+            .option(irisToggleButton(parent, session, profile, targetFps, iris, irisStatus, true))
+            .option(irisToggleButton(parent, session, profile, targetFps, iris, irisStatus, false));
 
         ControlCenterSession finalSession = session;
         return YetAnotherConfigLib.createBuilder()
@@ -247,6 +250,21 @@ final class LuminaControlCenterScreen {
         } catch (IOException exception) {
             LOGGER.error("Could not save Lumina Engine configuration", exception);
         }
+    }
+
+    private static ButtonOption irisToggleButton(Screen parent, ControlCenterSession session,
+                                                   Option<QualityProfile> profile, Option<Integer> targetFps,
+                                                   IrisIntegration iris, IrisStatus status, boolean enabled) {
+        return ButtonOption.createBuilder()
+            .name(Component.translatable(enabled ? "lumina_engine.iris.enable" : "lumina_engine.iris.disable"))
+            .text(Component.translatable(enabled ? "lumina_engine.action.enable" : "lumina_engine.action.disable"))
+            .available(status.installed() && status.shadersEnabled() != enabled)
+            .action((screen, option) -> Minecraft.getInstance().setScreenAndShow(new ConfirmScreen(confirmed -> {
+                if (confirmed) iris.setShadersEnabled(enabled);
+                Minecraft.getInstance().setScreenAndShow(create(parent, session, profile.pendingValue(), targetFps.pendingValue()));
+            }, Component.translatable("lumina_engine.iris.confirm.title"),
+                Component.translatable(enabled ? "lumina_engine.iris.confirm.enable" : "lumina_engine.iris.confirm.disable"))))
+            .build();
     }
 
     private static Component telemetryStatusText(FrameTimeSnapshot snapshot) {

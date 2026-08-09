@@ -25,4 +25,8 @@ final class IrisIntegration {
             MinecraftClient.getInstance().setScreen(IrisPublicApiAccess.createShaderScreen(parent));
         }
     }
+
+    void setShadersEnabled(boolean enabled) {
+        if (installedVersion.isPresent()) IrisPublicApiAccess.setShadersEnabled(enabled);
+    }
 }
