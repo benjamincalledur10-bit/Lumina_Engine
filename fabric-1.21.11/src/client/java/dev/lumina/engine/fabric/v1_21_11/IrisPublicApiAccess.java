@@ -28,4 +28,8 @@ final class IrisPublicApiAccess {
     static Screen createShaderScreen(Screen parent) {
         return (Screen) IrisApi.getInstance().openMainIrisScreenObj(parent);
     }
+
+    static void setShadersEnabled(boolean enabled) {
+        IrisApi.getInstance().getConfig().setShadersEnabledAndApply(enabled);
+    }
 }

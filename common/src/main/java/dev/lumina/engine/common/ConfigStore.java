@@ -35,7 +35,9 @@ public final class ConfigStore {
             LuminaConfig config = new LuminaConfig(
                 QualityProfile.fromString(serialized.profile),
                 serialized.targetFps,
-                serialized.adaptiveOptimizationEnabled
+                serialized.adaptiveOptimizationEnabled,
+                serialized.performanceHudEnabled,
+                serialized.performanceHudPosition == null ? HudPosition.TOP_LEFT : serialized.performanceHudPosition
             );
             return new LoadResult(config, false, null);
         } catch (JsonParseException | IllegalArgumentException | IllegalStateException exception) {
@@ -56,7 +58,9 @@ public final class ConfigStore {
         SerializedConfig serialized = new SerializedConfig(
             config.profile().serializedName(),
             config.targetFps(),
-            config.adaptiveOptimizationEnabled()
+            config.adaptiveOptimizationEnabled(),
+            config.performanceHudEnabled(),
+            config.performanceHudPosition()
         );
         Path temporaryFile = configPath.resolveSibling(configPath.getFileName() + ".tmp");
         Files.writeString(temporaryFile, GSON.toJson(serialized) + System.lineSeparator(), StandardCharsets.UTF_8);
@@ -83,5 +87,6 @@ public final class ConfigStore {
 
     public record LoadResult(LuminaConfig config, boolean recoveredFromCorruption, Path corruptBackup) {}
 
-    private record SerializedConfig(String profile, int targetFps, boolean adaptiveOptimizationEnabled) {}
+    private record SerializedConfig(String profile, int targetFps, boolean adaptiveOptimizationEnabled,
+                                    boolean performanceHudEnabled, HudPosition performanceHudPosition) {}
 }

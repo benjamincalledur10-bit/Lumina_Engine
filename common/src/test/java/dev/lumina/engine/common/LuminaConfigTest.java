@@ -7,6 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 class LuminaConfigTest {
+    @org.junit.jupiter.api.Test
+    void hudDefaultsOffAtTopLeft() {
+        LuminaConfig config = LuminaConfig.defaults();
+        org.junit.jupiter.api.Assertions.assertFalse(config.performanceHudEnabled());
+        org.junit.jupiter.api.Assertions.assertEquals(HudPosition.TOP_LEFT, config.performanceHudPosition());
+    }
     @Test
     void defaultsAreBalancedAtSixtyFpsWithAdaptiveOptimizationDisabled() {
         LuminaConfig config = LuminaConfig.defaults();
