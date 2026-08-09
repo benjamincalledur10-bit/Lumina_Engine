@@ -20,6 +20,7 @@ import dev.lumina.engine.common.adaptive.RecommendationResult;
 import dev.lumina.engine.common.adaptive.QualityAdjustmentPlan;
 import dev.lumina.engine.common.adaptive.PlannedAdjustment;
 import java.io.IOException;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
@@ -32,8 +33,6 @@ final class LuminaControlCenterScreen {
 
     static Screen create(Screen parent) {
         FabricPlatformAdapter platform = new FabricPlatformAdapter();
-        IrisIntegration iris = new IrisIntegration(platform);
-        IrisStatus irisStatus = iris.status();
         ConfigStore store = new ConfigStore(platform.configDirectory().resolve(LuminaEngineClient.MOD_ID + ".json"));
         ControlCenterSession session;
         try {
@@ -42,6 +41,18 @@ final class LuminaControlCenterScreen {
             LOGGER.error("Could not load configuration for the Lumina Control Center; showing safe defaults", exception);
             session = ControlCenterSession.withDefaults(store, platform);
         }
+        return create(parent, session, session.profile(), session.targetFps());
+    }
+
+    private static Screen create(
+        Screen parent,
+        ControlCenterSession session,
+        QualityProfile pendingProfile,
+        int pendingTargetFps
+    ) {
+        FabricPlatformAdapter platform = new FabricPlatformAdapter();
+        IrisIntegration iris = new IrisIntegration(platform);
+        IrisStatus irisStatus = iris.status();
 
         Option<QualityProfile> profile = Option.<QualityProfile>createBuilder()
             .name(Component.translatable("lumina_engine.option.profile"))
@@ -51,6 +62,7 @@ final class LuminaControlCenterScreen {
                 .enumClass(QualityProfile.class)
                 .formatValue(value -> Component.translatable(profileTranslationKey(value))))
             .build();
+        profile.requestSet(pendingProfile);
 
         Option<Integer> targetFps = Option.<Integer>createBuilder()
             .name(Component.translatable("lumina_engine.option.target_fps"))
@@ -61,6 +73,7 @@ final class LuminaControlCenterScreen {
                 .step(1)
                 .formatValue(value -> Component.translatable("lumina_engine.option.target_fps.value", value)))
             .build();
+        targetFps.requestSet(pendingTargetFps);
 
         Option<Boolean> adaptive = Option.<Boolean>createBuilder()
             .name(Component.translatable("lumina_engine.option.adaptive"))
@@ -83,10 +96,22 @@ final class LuminaControlCenterScreen {
 
         ConfigCategory.Builder diagnostics = ConfigCategory.createBuilder()
             .name(Component.translatable("lumina_engine.category.diagnostics"));
+        ButtonOption refreshDiagnostics = ButtonOption.createBuilder()
+            .name(Component.translatable("lumina_engine.diagnostics.refresh"))
+            .description(OptionDescription.of(Component.translatable("lumina_engine.diagnostics.refresh.description")))
+            .text(Component.translatable("lumina_engine.action.refresh"))
+            .action((screen, option) -> Minecraft.getInstance().setScreenAndShow(create(
+                parent,
+                session,
+                profile.pendingValue(),
+                targetFps.pendingValue()
+            )))
+            .build();
         FrameTimeSnapshot metrics = FrameTelemetryRuntime.latest();
         RecommendationResult recommendation = FrameTelemetryRuntime.recommendation();
         QualityAdjustmentPlan plan = FrameTelemetryRuntime.plan();
         diagnostics
+            .option(refreshDiagnostics)
             .option(LabelOption.create(Component.translatable("lumina_engine.recommendation", recommendationText(recommendation))))
             .option(LabelOption.create(Component.translatable("lumina_engine.recommendation.reason", reasonText(recommendation))))
             .option(LabelOption.create(planText(plan)))

@@ -82,8 +82,10 @@ Pinned development versions:
 | Distant Horizons | Detected at runtime | Detected at runtime | Optional |
 
 Iris, Sodium, Mod Menu, and Distant Horizons are not required for startup.
-The optional Mod Menu integration uses its public API; Iris, Sodium, and Distant
-Horizons are detected through Fabric Loader without linking or copying their APIs.
+The optional Mod Menu integration uses its public API. Iris is an optional
+compile-time dependency used exclusively through its public
+`net.irisshaders.iris.api.v0` API and is not included in Lumina Engine's JARs.
+Sodium and Distant Horizons are detected only through Fabric Loader.
 
 ## Lumina Control Center
 
@@ -94,6 +96,7 @@ screen. The Control Center currently provides:
 - a target FPS slider from 30 to 240;
 - save, cancel, per-option reset, and complete default restoration behavior;
 - a read-only diagnostics category with detected dependency versions;
+- a manual diagnostics refresh that preserves unsaved profile and FPS changes;
 - read-only Iris state showing whether shaders are loaded and whether a shader
   pack is actively compiled and in use;
 - a button that opens Iris's public shader-pack screen when Iris is installed;
