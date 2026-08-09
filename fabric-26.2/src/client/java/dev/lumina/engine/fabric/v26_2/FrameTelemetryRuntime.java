@@ -2,11 +2,14 @@ package dev.lumina.engine.fabric.v26_2;
 
 import dev.lumina.engine.common.QualityProfile;
 import dev.lumina.engine.common.adaptive.AdaptiveRecommendationEngine;
+import dev.lumina.engine.common.adaptive.ActionableRecommendation;
+import dev.lumina.engine.common.adaptive.ActionableRecommendationTracker;
 import dev.lumina.engine.common.adaptive.RecommendationReason;
 import dev.lumina.engine.common.adaptive.RecommendationResult;
 import dev.lumina.engine.common.adaptive.QualityAdjustmentPlan;
 import dev.lumina.engine.common.adaptive.QualityAdjustmentPlanner;
 import java.lang.ref.WeakReference;
+import java.util.Optional;
 import dev.lumina.engine.common.telemetry.FrameTimeMonitor;
 import dev.lumina.engine.common.telemetry.FrameTimeSnapshot;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
@@ -16,6 +19,7 @@ final class FrameTelemetryRuntime {
     private static final long UPDATE_INTERVAL_NANOS = 1_000_000_000L;
     private static final FrameTimeMonitor MONITOR = new FrameTimeMonitor();
     private static final AdaptiveRecommendationEngine RECOMMENDATIONS = new AdaptiveRecommendationEngine();
+    private static final ActionableRecommendationTracker ACTIONABLE = new ActionableRecommendationTracker();
     private static int targetFps = 60;
     private static QualityProfile profile = QualityProfile.BALANCED;
     private static WeakReference<Object> lastWorld = new WeakReference<>(null);
@@ -58,6 +62,8 @@ final class FrameTelemetryRuntime {
     static FrameTimeSnapshot latest() { return latest; }
     static RecommendationResult recommendation() { return recommendation; }
     static QualityAdjustmentPlan plan() { return plan; }
+    static Optional<ActionableRecommendation> actionableRecommendation() { return ACTIONABLE.current(); }
+    static void dismissActionableRecommendation() { ACTIONABLE.dismiss(); }
 
     private static void record(long now) {
         if (now >= nextUpdate) {
@@ -74,6 +80,7 @@ final class FrameTelemetryRuntime {
             latest = MONITOR.snapshot(targetFps);
             recommendation = RECOMMENDATIONS.evaluate(latest, profile, now);
             plan = QualityAdjustmentPlanner.plan(profile, recommendation.recommendation());
+            ACTIONABLE.observe(recommendation, profile, now, System.currentTimeMillis());
             nextUpdate = now + UPDATE_INTERVAL_NANOS;
         }
     }
@@ -84,6 +91,7 @@ final class FrameTelemetryRuntime {
         latest = FrameTimeSnapshot.warmingUp(0, targetFps);
         recommendation = RecommendationResult.hold(RecommendationReason.WARMING_UP);
         plan = QualityAdjustmentPlanner.plan(profile, recommendation.recommendation());
+        ACTIONABLE.resetContext();
         nextUpdate = now + UPDATE_INTERVAL_NANOS;
     }
 

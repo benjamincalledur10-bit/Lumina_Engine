@@ -17,9 +17,11 @@ import dev.lumina.engine.common.QualityProfile;
 import dev.lumina.engine.common.iris.IrisStatus;
 import dev.lumina.engine.common.telemetry.FrameTimeSnapshot;
 import dev.lumina.engine.common.adaptive.RecommendationResult;
+import dev.lumina.engine.common.adaptive.ActionableRecommendation;
 import dev.lumina.engine.common.adaptive.QualityAdjustmentPlan;
 import dev.lumina.engine.common.adaptive.PlannedAdjustment;
 import java.io.IOException;
+import java.time.Instant;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -123,6 +125,28 @@ final class LuminaControlCenterScreen {
         for (PlannedAdjustment adjustment : plan.adjustments()) {
             diagnostics.option(LabelOption.create(adjustmentText(adjustment)));
         }
+        FrameTelemetryRuntime.actionableRecommendation().ifPresent(actionable -> {
+            diagnostics
+                .option(LabelOption.create(Component.translatable("lumina_engine.actionable.title")))
+                .option(LabelOption.create(Component.translatable("lumina_engine.actionable.profile",
+                    Component.translatable(profileTranslationKey(actionable.suggestedProfile())))))
+                .option(LabelOption.create(Component.translatable("lumina_engine.actionable.generated",
+                    Instant.ofEpochMilli(actionable.generatedAtEpochMillis()).toString())))
+                .option(LabelOption.create(Component.translatable("lumina_engine.actionable.cooldown",
+                    Math.ceil(actionable.cooldownRemainingNanos(System.nanoTime()) / 1_000_000_000.0))));
+            for (PlannedAdjustment adjustment : actionable.plan().adjustments()) {
+                diagnostics.option(LabelOption.create(adjustmentText(adjustment)));
+            }
+            diagnostics.option(ButtonOption.createBuilder()
+                .name(Component.translatable("lumina_engine.actionable.dismiss"))
+                .text(Component.translatable("lumina_engine.action.dismiss"))
+                .action((screen, option) -> {
+                    FrameTelemetryRuntime.dismissActionableRecommendation();
+                    Minecraft.getInstance().setScreenAndShow(create(parent, session,
+                        profile.pendingValue(), targetFps.pendingValue()));
+                })
+                .build());
+        });
         for (ModStatus status : session.diagnostics().mods()) {
             if (!"iris".equals(status.id())) {
                 diagnostics.option(LabelOption.create(diagnosticText(status)));
