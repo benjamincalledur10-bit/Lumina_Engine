@@ -10,15 +10,24 @@ public final class LuminaConfig {
     private QualityProfile profile;
     private int targetFps;
     private boolean adaptiveOptimizationEnabled;
+    private boolean performanceHudEnabled;
+    private HudPosition performanceHudPosition;
 
     public LuminaConfig() {
-        this(QualityProfile.BALANCED, DEFAULT_TARGET_FPS, false);
+        this(QualityProfile.BALANCED, DEFAULT_TARGET_FPS, false, false, HudPosition.TOP_LEFT);
     }
 
     public LuminaConfig(QualityProfile profile, int targetFps, boolean adaptiveOptimizationEnabled) {
+        this(profile, targetFps, adaptiveOptimizationEnabled, false, HudPosition.TOP_LEFT);
+    }
+
+    public LuminaConfig(QualityProfile profile, int targetFps, boolean adaptiveOptimizationEnabled,
+                        boolean performanceHudEnabled, HudPosition performanceHudPosition) {
         this.profile = Objects.requireNonNull(profile, "profile");
         setTargetFps(targetFps);
         this.adaptiveOptimizationEnabled = adaptiveOptimizationEnabled;
+        this.performanceHudEnabled = performanceHudEnabled;
+        this.performanceHudPosition = Objects.requireNonNull(performanceHudPosition, "performanceHudPosition");
     }
 
     public static LuminaConfig defaults() {
@@ -26,7 +35,7 @@ public final class LuminaConfig {
     }
 
     public LuminaConfig copy() {
-        return new LuminaConfig(profile, targetFps, adaptiveOptimizationEnabled);
+        return new LuminaConfig(profile, targetFps, adaptiveOptimizationEnabled, performanceHudEnabled, performanceHudPosition);
     }
 
     public QualityProfile profile() {
@@ -57,4 +66,9 @@ public final class LuminaConfig {
     public void setAdaptiveOptimizationEnabled(boolean adaptiveOptimizationEnabled) {
         this.adaptiveOptimizationEnabled = adaptiveOptimizationEnabled;
     }
+
+    public boolean performanceHudEnabled() { return performanceHudEnabled; }
+    public void setPerformanceHudEnabled(boolean value) { performanceHudEnabled = value; }
+    public HudPosition performanceHudPosition() { return performanceHudPosition; }
+    public void setPerformanceHudPosition(HudPosition value) { performanceHudPosition = Objects.requireNonNull(value); }
 }

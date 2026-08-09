@@ -18,11 +18,15 @@ public final class LuminaEngineClient implements ClientModInitializer {
         ConfigStore configStore = new ConfigStore(platform.configDirectory().resolve(MOD_ID + ".json"));
         int targetFps = LuminaConfig.DEFAULT_TARGET_FPS;
         var profile = dev.lumina.engine.common.QualityProfile.BALANCED;
+        boolean hudEnabled = false;
+        var hudPosition = dev.lumina.engine.common.HudPosition.TOP_LEFT;
 
         try {
             ConfigStore.LoadResult result = configStore.load();
             targetFps = result.config().targetFps();
             profile = result.config().profile();
+            hudEnabled = result.config().performanceHudEnabled();
+            hudPosition = result.config().performanceHudPosition();
             if (result.recoveredFromCorruption()) {
                 LOGGER.warn("Recovered corrupt configuration; backup saved to {}", result.corruptBackup());
             }
@@ -36,7 +40,8 @@ public final class LuminaEngineClient implements ClientModInitializer {
             LOGGER.error("Could not load Lumina Engine configuration; using in-memory defaults", exception);
         }
 
-        FrameTelemetryRuntime.initialize(targetFps, profile);
+        FrameTelemetryRuntime.initialize(targetFps, profile, hudEnabled, hudPosition);
+        PerformanceHud.initialize();
 
         Diagnostics.inspect(platform).mods().forEach(status ->
             LOGGER.info("Dependency diagnostic: {} ({})", status.displayName(), status.version())

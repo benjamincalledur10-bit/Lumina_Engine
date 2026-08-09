@@ -1,6 +1,7 @@
 package dev.lumina.engine.fabric.v1_21_11;
 
 import dev.lumina.engine.common.QualityProfile;
+import dev.lumina.engine.common.HudPosition;
 import dev.lumina.engine.common.adaptive.AdaptiveRecommendationEngine;
 import dev.lumina.engine.common.adaptive.ActionableRecommendation;
 import dev.lumina.engine.common.adaptive.ActionableRecommendationTracker;
@@ -38,6 +39,8 @@ final class FrameTelemetryRuntime {
     private static long savedBenchmarkTimestamp = Long.MIN_VALUE;
     private static int targetFps = 60;
     private static QualityProfile profile = QualityProfile.BALANCED;
+    private static boolean hudEnabled;
+    private static HudPosition hudPosition = HudPosition.TOP_LEFT;
     private static WeakReference<Object> lastWorld = new WeakReference<>(null);
     private static String lastIrisState;
     private static long nextUpdate;
@@ -47,9 +50,11 @@ final class FrameTelemetryRuntime {
 
     private FrameTelemetryRuntime() {}
 
-    static void initialize(int configuredTargetFps, QualityProfile configuredProfile) {
+    static void initialize(int configuredTargetFps, QualityProfile configuredProfile, boolean configuredHudEnabled, HudPosition configuredHudPosition) {
         targetFps = configuredTargetFps;
         profile = configuredProfile;
+        hudEnabled = configuredHudEnabled;
+        hudPosition = configuredHudPosition;
         latest = FrameTimeSnapshot.warmingUp(0, targetFps);
         benchmarkStore = new BenchmarkHistoryStore(new FabricPlatformAdapter().configDirectory().resolve("lumina_engine_benchmarks.json"));
         try { benchmarkHistory = benchmarkStore.load(); }
@@ -81,6 +86,9 @@ final class FrameTelemetryRuntime {
     static FrameTimeSnapshot latest() { return latest; }
     static RecommendationResult recommendation() { return recommendation; }
     static QualityAdjustmentPlan plan() { return plan; }
+    static boolean hudEnabled() { return hudEnabled; }
+    static HudPosition hudPosition() { return hudPosition; }
+    static void setHud(boolean enabled, HudPosition position) { hudEnabled = enabled; hudPosition = position; }
     static Optional<ActionableRecommendation> actionableRecommendation() { return ACTIONABLE.current(); }
     static void dismissActionableRecommendation() { ACTIONABLE.dismiss(); }
     static void startBenchmark() { BENCHMARK.start(System.nanoTime()); }

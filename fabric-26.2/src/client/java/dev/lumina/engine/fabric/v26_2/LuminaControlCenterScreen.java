@@ -14,6 +14,7 @@ import dev.lumina.engine.common.ControlCenterSession;
 import dev.lumina.engine.common.LuminaConfig;
 import dev.lumina.engine.common.ModStatus;
 import dev.lumina.engine.common.QualityProfile;
+import dev.lumina.engine.common.HudPosition;
 import dev.lumina.engine.common.iris.IrisStatus;
 import dev.lumina.engine.common.telemetry.FrameTimeSnapshot;
 import dev.lumina.engine.common.benchmark.BenchmarkResult;
@@ -92,6 +93,18 @@ final class LuminaControlCenterScreen {
             .available(false)
             .build();
 
+        Option<Boolean> performanceHud = Option.<Boolean>createBuilder()
+            .name(Component.translatable("lumina_engine.option.hud"))
+            .description(OptionDescription.of(Component.translatable("lumina_engine.option.hud.description")))
+            .binding(false, session::performanceHudEnabled, session::setPerformanceHudEnabled)
+            .controller(BooleanControllerBuilder::create).build();
+        Option<HudPosition> hudPosition = Option.<HudPosition>createBuilder()
+            .name(Component.translatable("lumina_engine.option.hud_position"))
+            .binding(HudPosition.TOP_LEFT, session::performanceHudPosition, session::setPerformanceHudPosition)
+            .controller(option -> EnumControllerBuilder.create(option).enumClass(HudPosition.class)
+                .formatValue(value -> Component.translatable("lumina_engine.hud.position." + value.name().toLowerCase(java.util.Locale.ROOT))))
+            .build();
+
         ButtonOption restoreDefaults = ButtonOption.createBuilder()
             .name(Component.translatable("lumina_engine.option.restore_defaults"))
             .description(OptionDescription.of(Component.translatable("lumina_engine.option.restore_defaults.description")))
@@ -100,6 +113,8 @@ final class LuminaControlCenterScreen {
                 profile.requestSetDefault();
                 targetFps.requestSetDefault();
                 adaptive.requestSetDefault();
+                performanceHud.requestSetDefault();
+                hudPosition.requestSetDefault();
             })
             .build();
 
@@ -213,6 +228,8 @@ final class LuminaControlCenterScreen {
                 .option(profile)
                 .option(targetFps)
                 .option(adaptive)
+                .option(performanceHud)
+                .option(hudPosition)
                 .option(restoreDefaults)
                 .build())
             .category(diagnostics.build())
@@ -226,6 +243,7 @@ final class LuminaControlCenterScreen {
             session.save();
             FrameTelemetryRuntime.setTargetFps(session.targetFps());
             FrameTelemetryRuntime.setProfile(session.profile());
+            FrameTelemetryRuntime.setHud(session.performanceHudEnabled(), session.performanceHudPosition());
         } catch (IOException exception) {
             LOGGER.error("Could not save Lumina Engine configuration", exception);
         }

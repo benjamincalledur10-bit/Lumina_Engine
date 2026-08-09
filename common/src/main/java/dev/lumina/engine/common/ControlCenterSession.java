@@ -50,6 +50,11 @@ public final class ControlCenterSession {
         return draftConfig.adaptiveOptimizationEnabled();
     }
 
+    public boolean performanceHudEnabled() { return draftConfig.performanceHudEnabled(); }
+    public void setPerformanceHudEnabled(boolean value) { draftConfig.setPerformanceHudEnabled(value); }
+    public HudPosition performanceHudPosition() { return draftConfig.performanceHudPosition(); }
+    public void setPerformanceHudPosition(HudPosition value) { draftConfig.setPerformanceHudPosition(value); }
+
     public DiagnosticResult diagnostics() {
         return diagnostics;
     }
