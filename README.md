@@ -17,7 +17,7 @@ optimizations belong in the Lumina shaders; the engine coordinates compatible
 settings and will make measured, user-authorized adjustments in future releases.
 
 > [!IMPORTANT]
-> The project is in alpha preparation. Version `0.0.1-alpha.1` is not a stable
+> The project is in alpha development. Version `0.0.1-alpha.2` is not a stable
 > release and must be tested before publication.
 
 ## Supported targets
@@ -45,6 +45,13 @@ unobfuscated and requires a different Loom pipeline and Java toolchain.
 - Local, read-only frame-time metrics with warmup and invalid-sample handling
 - Read-only adaptive quality recommendations with hysteresis and cooldowns
 - One-level quality adjustment plan previews that are never applied automatically
+- Persistent actionable recommendations with dismissal and cooldown status
+- User-started 10-second warmup plus 60-second benchmark sessions
+- Local benchmark history and before/after comparison
+- Iris/Sodium compatibility advisor for verified, untested, unknown, and incompatible pairs
+- Optional four-position performance HUD, disabled by default
+- Confirmed, user-authorized Iris shader enable/disable controls
+- Manual Event Horizon and Lumina Lite preset guidance
 - Unit tests for shared, Minecraft-independent behavior
 
 No settings are changed automatically. Lumina Engine never downloads mods or
@@ -101,6 +108,9 @@ screen. The Control Center currently provides:
   pack is actively compiled and in use;
 - a button that opens Iris's public shader-pack screen when Iris is installed;
 - English and Spanish translations selected by Minecraft's language setting.
+- Mexican Spanish (`es_mx`) translations;
+- guided benchmarks, local comparisons, compatibility advice, and an optional HUD;
+- explicit Iris enable/disable buttons that always require confirmation.
 
 Adaptive optimization is visible but deliberately unavailable. The values saved
 by this screen are configuration targets only: they do not modify Minecraft,
@@ -108,8 +118,9 @@ Iris, Sodium, or shader settings yet.
 
 The diagnostics panel also displays local frame-time statistics, a read-only
 quality recommendation, its reason, and a preview of the next profile and
-adjustment domains. Measurements stay in memory, are never transmitted or
-stored as history, and reset when relevant client context changes.
+adjustment domains. Live measurements stay in memory and are never transmitted.
+Completed benchmark results are stored locally in
+`config/lumina_engine_benchmarks.json` with no personal information.
 
 The Iris bridge uses only `net.irisshaders.iris.api.v0`. It is loaded lazily,
 so Iris remains optional, and it deliberately does not inspect Iris internals,
@@ -133,8 +144,8 @@ Individual targets can be built with:
 
 The two distributable JARs are written to each platform module's `build/libs/`:
 
-- `fabric-1.21.11/build/libs/lumina-engine-fabric-1.21.11-0.0.1-alpha.1.jar`
-- `fabric-26.2/build/libs/lumina-engine-fabric-26.2-0.0.1-alpha.1.jar`
+- `fabric-1.21.11/build/libs/lumina-engine-fabric-1.21.11-0.0.1-alpha.2.jar`
+- `fabric-26.2/build/libs/lumina-engine-fabric-26.2-0.0.1-alpha.2.jar`
 
 Files whose names contain `sources` are development artifacts and must not be
 installed. Iris and Sodium are optional external mods and are not bundled.
@@ -152,11 +163,11 @@ temporary file and an atomic move whenever the filesystem supports it.
   remains disabled and cannot apply them.
 - Lumina Engine does not alter Minecraft, Iris, Sodium, Distant Horizons, or
   shader settings.
-- Event Horizon and Lumina Lite are not identified by name and have no direct
-  integration yet because the public Iris API does not expose the selected
-  shader-pack name.
-- There is no benchmark, automatic tuning, shader uniform control, telemetry,
-  persistent performance history, or real-client automated smoke test yet.
+- Event Horizon and Lumina Lite are not identified automatically because the
+  public Iris API does not expose the selected shader-pack name. Preset guidance
+  must be followed manually.
+- There is no automatic tuning, shader uniform control, telemetry, or
+  real-client automated smoke test yet.
 - A failed configuration write is reported in the log, not in the UI.
 
 Future integrations must use stable APIs or an isolated compatibility

@@ -22,6 +22,7 @@ import dev.lumina.engine.common.benchmark.BenchmarkSnapshot;
 import dev.lumina.engine.common.benchmark.BenchmarkComparison;
 import dev.lumina.engine.common.compat.CompatibilityAdvisor;
 import dev.lumina.engine.common.compat.CompatibilityAssessment;
+import dev.lumina.engine.common.shader.LuminaShaderPresetGuide;
 import dev.lumina.engine.common.adaptive.RecommendationResult;
 import dev.lumina.engine.common.adaptive.ActionableRecommendation;
 import dev.lumina.engine.common.adaptive.QualityAdjustmentPlan;
@@ -212,7 +213,12 @@ final class LuminaControlCenterScreen {
             .option(LabelOption.create(Text.translatable(
                 "lumina_engine.iris.shader_active",
                 booleanText(irisStatus.shaderActive())
-            )))
+            )));
+        LuminaShaderPresetGuide.forProfile(profile.pendingValue()).ifPresent(guide -> diagnostics
+            .option(LabelOption.create(Text.translatable("lumina_engine.shader.event_horizon_preset", guide.eventHorizonPreset())))
+            .option(LabelOption.create(Text.translatable("lumina_engine.shader.lite_preset", guide.luminaLitePreset())))
+            .option(LabelOption.create(Text.translatable("lumina_engine.shader.guidance.manual"))));
+        diagnostics
             .option(ButtonOption.createBuilder()
                 .name(Text.translatable("lumina_engine.iris.open"))
                 .description(OptionDescription.of(Text.translatable("lumina_engine.iris.open.description")))
