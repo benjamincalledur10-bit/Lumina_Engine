@@ -1,0 +1,22 @@
+{
+  "lumina_engine.control_center.title": "Lumina Control Center",
+  "lumina_engine.category.configuration": "Configuration",
+  "lumina_engine.category.diagnostics": "Diagnostics",
+  "lumina_engine.option.profile": "Quality profile",
+  "lumina_engine.option.profile.description": "Selects the Lumina quality policy. Shader settings are not changed yet.",
+  "lumina_engine.option.target_fps": "Target FPS",
+  "lumina_engine.option.target_fps.description": "Target for future adaptive optimization. Valid range: 30–240 FPS.",
+  "lumina_engine.option.target_fps.value": "%s FPS",
+  "lumina_engine.option.adaptive": "Adaptive optimization",
+  "lumina_engine.option.adaptive.description": "Planned feature. It remains unavailable until adaptive control is implemented.",
+  "lumina_engine.option.restore_defaults": "Restore defaults",
+  "lumina_engine.option.restore_defaults.description": "Restores Balanced, 60 FPS, and disables adaptive optimization.",
+  "lumina_engine.action.restore": "Restore",
+  "lumina_engine.diagnostic.installed": "%s: installed (%s)",
+  "lumina_engine.diagnostic.missing": "%s: not installed",
+  "lumina_engine.profile.performance": "Performance",
+  "lumina_engine.profile.balanced": "Balanced",
+  "lumina_engine.profile.quality": "Quality",
+  "lumina_engine.profile.cinematic": "Cinematic",
+  "lumina_engine.profile.custom": "Custom"
+}

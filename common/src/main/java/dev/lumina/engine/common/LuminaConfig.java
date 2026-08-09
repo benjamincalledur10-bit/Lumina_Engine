@@ -25,6 +25,10 @@ public final class LuminaConfig {
         return new LuminaConfig();
     }
 
+    public LuminaConfig copy() {
+        return new LuminaConfig(profile, targetFps, adaptiveOptimizationEnabled);
+    }
+
     public QualityProfile profile() {
         return profile;
     }

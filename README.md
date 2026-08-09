@@ -39,6 +39,8 @@ unobfuscated and requires a different Loom pipeline and Java toolchain.
 - Atomic JSON configuration writes and corrupt-file recovery
 - Local dependency/version diagnostics without telemetry
 - Detection of Fabric API, YACL, Mod Menu, Iris, Sodium, and Distant Horizons
+- YACL-based Lumina Control Center available through Mod Menu
+- English and Spanish interface translations
 - Unit tests for shared, Minecraft-independent behavior
 
 No settings are changed automatically. Lumina Engine never downloads mods or
@@ -76,7 +78,23 @@ Pinned development versions:
 | Distant Horizons | Detected at runtime | Detected at runtime | Optional |
 
 Iris, Sodium, Mod Menu, and Distant Horizons are not required for startup.
-Their APIs are not linked or copied.
+The optional Mod Menu integration uses its public API; Iris, Sodium, and Distant
+Horizons are detected through Fabric Loader without linking or copying their APIs.
+
+## Lumina Control Center
+
+When Mod Menu is installed, select **Lumina Engine** and open its configuration
+screen. The Control Center currently provides:
+
+- a selector for all five quality profiles;
+- a target FPS slider from 30 to 240;
+- save, cancel, per-option reset, and complete default restoration behavior;
+- a read-only diagnostics category with detected dependency versions; and
+- English and Spanish translations selected by Minecraft's language setting.
+
+Adaptive optimization is visible but deliberately unavailable. The values saved
+by this screen are configuration targets only: they do not modify Minecraft,
+Iris, Sodium, or shader settings yet.
 
 ## Build and test
 

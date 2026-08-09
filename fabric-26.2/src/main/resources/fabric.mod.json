@@ -16,6 +16,9 @@
   "entrypoints": {
     "client": [
       "dev.lumina.engine.fabric.v26_2.LuminaEngineClient"
+    ],
+    "modmenu": [
+      "dev.lumina.engine.fabric.v26_2.LuminaEngineModMenu"
     ]
   },
   "depends": {
@@ -23,10 +26,10 @@
     "minecraft": "=26.2",
     "java": ">=25",
     "fabric-api": "*",
-    "yet_another_config_lib_v3": "*"
+    "yet_another_config_lib_v3": ">=3.9.6"
   },
   "recommends": {
-    "modmenu": "*",
+    "modmenu": ">=20.0.1",
     "iris": "*",
     "sodium": "*"
   },
