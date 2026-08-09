@@ -16,6 +16,8 @@ import dev.lumina.engine.common.ModStatus;
 import dev.lumina.engine.common.QualityProfile;
 import dev.lumina.engine.common.iris.IrisStatus;
 import dev.lumina.engine.common.telemetry.FrameTimeSnapshot;
+import dev.lumina.engine.common.benchmark.BenchmarkResult;
+import dev.lumina.engine.common.benchmark.BenchmarkSnapshot;
 import dev.lumina.engine.common.adaptive.RecommendationResult;
 import dev.lumina.engine.common.adaptive.ActionableRecommendation;
 import dev.lumina.engine.common.adaptive.QualityAdjustmentPlan;
@@ -110,10 +112,32 @@ final class LuminaControlCenterScreen {
             )))
             .build();
         FrameTimeSnapshot metrics = FrameTelemetryRuntime.latest();
+        BenchmarkSnapshot benchmark = FrameTelemetryRuntime.benchmark();
         RecommendationResult recommendation = FrameTelemetryRuntime.recommendation();
         QualityAdjustmentPlan plan = FrameTelemetryRuntime.plan();
         diagnostics
             .option(refreshDiagnostics)
+            .option(LabelOption.create(Component.translatable("lumina_engine.benchmark.status",
+                Component.translatable("lumina_engine.benchmark.phase." + benchmark.phase().name().toLowerCase(java.util.Locale.ROOT)),
+                Math.round(benchmark.progress() * 100))))
+            .option(ButtonOption.createBuilder()
+                .name(Component.translatable("lumina_engine.benchmark.start"))
+                .text(Component.translatable("lumina_engine.action.start"))
+                .available(!benchmark.phase().equals(dev.lumina.engine.common.benchmark.BenchmarkPhase.WARMING_UP)
+                    && !benchmark.phase().equals(dev.lumina.engine.common.benchmark.BenchmarkPhase.MEASURING))
+                .action((screen, option) -> {
+                    FrameTelemetryRuntime.startBenchmark();
+                    Minecraft.getInstance().setScreenAndShow(create(parent, session, profile.pendingValue(), targetFps.pendingValue()));
+                }).build())
+            .option(ButtonOption.createBuilder()
+                .name(Component.translatable("lumina_engine.benchmark.cancel"))
+                .text(Component.translatable("lumina_engine.action.cancel"))
+                .available(benchmark.phase().equals(dev.lumina.engine.common.benchmark.BenchmarkPhase.WARMING_UP)
+                    || benchmark.phase().equals(dev.lumina.engine.common.benchmark.BenchmarkPhase.MEASURING))
+                .action((screen, option) -> {
+                    FrameTelemetryRuntime.cancelBenchmark();
+                    Minecraft.getInstance().setScreenAndShow(create(parent, session, profile.pendingValue(), targetFps.pendingValue()));
+                }).build())
             .option(LabelOption.create(Component.translatable("lumina_engine.recommendation", recommendationText(recommendation))))
             .option(LabelOption.create(Component.translatable("lumina_engine.recommendation.reason", reasonText(recommendation))))
             .option(LabelOption.create(planText(plan)))
@@ -122,6 +146,7 @@ final class LuminaControlCenterScreen {
             .option(LabelOption.create(Component.translatable("lumina_engine.telemetry.stable_minimum_fps", format(metrics.stableMinimumFps()))))
             .option(LabelOption.create(Component.translatable("lumina_engine.telemetry.one_percent_low", format(metrics.onePercentLowFps()))))
             .option(LabelOption.create(Component.translatable("lumina_engine.telemetry.frame_time", format(metrics.averageFrameTimeMillis()), format(metrics.p95FrameTimeMillis()))));
+        benchmark.result().ifPresent(result -> addBenchmarkResult(diagnostics, result));
         for (PlannedAdjustment adjustment : plan.adjustments()) {
             diagnostics.option(LabelOption.create(adjustmentText(adjustment)));
         }
@@ -201,6 +226,13 @@ final class LuminaControlCenterScreen {
     }
 
     private static String format(double value) { return String.format(java.util.Locale.ROOT, "%.1f", value); }
+
+    private static void addBenchmarkResult(ConfigCategory.Builder diagnostics, BenchmarkResult result) {
+        diagnostics
+            .option(LabelOption.create(Component.translatable("lumina_engine.benchmark.result.fps", format(result.averageFps()), format(result.stableMinimumFps()), format(result.onePercentLowFps()))))
+            .option(LabelOption.create(Component.translatable("lumina_engine.benchmark.result.frame_time", format(result.averageFrameTimeMillis()), format(result.p95FrameTimeMillis()))))
+            .option(LabelOption.create(Component.translatable("lumina_engine.benchmark.result.target", format(result.targetMetPercent()), result.targetFps())));
+    }
 
     private static Component recommendationText(RecommendationResult result) {
         return Component.translatable("lumina_engine.recommendation." + result.recommendation().name().toLowerCase(java.util.Locale.ROOT));

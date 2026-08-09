@@ -12,6 +12,8 @@ import java.lang.ref.WeakReference;
 import java.util.Optional;
 import dev.lumina.engine.common.telemetry.FrameTimeMonitor;
 import dev.lumina.engine.common.telemetry.FrameTimeSnapshot;
+import dev.lumina.engine.common.benchmark.BenchmarkSnapshot;
+import dev.lumina.engine.common.benchmark.GuidedBenchmarkSession;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 
@@ -20,6 +22,7 @@ final class FrameTelemetryRuntime {
     private static final FrameTimeMonitor MONITOR = new FrameTimeMonitor();
     private static final AdaptiveRecommendationEngine RECOMMENDATIONS = new AdaptiveRecommendationEngine();
     private static final ActionableRecommendationTracker ACTIONABLE = new ActionableRecommendationTracker();
+    private static final GuidedBenchmarkSession BENCHMARK = new GuidedBenchmarkSession();
     private static int targetFps = 60;
     private static QualityProfile profile = QualityProfile.BALANCED;
     private static WeakReference<Object> lastWorld = new WeakReference<>(null);
@@ -64,6 +67,9 @@ final class FrameTelemetryRuntime {
     static QualityAdjustmentPlan plan() { return plan; }
     static Optional<ActionableRecommendation> actionableRecommendation() { return ACTIONABLE.current(); }
     static void dismissActionableRecommendation() { ACTIONABLE.dismiss(); }
+    static void startBenchmark() { BENCHMARK.start(System.nanoTime()); }
+    static void cancelBenchmark() { BENCHMARK.cancel(); }
+    static BenchmarkSnapshot benchmark() { return BENCHMARK.snapshot(System.nanoTime()); }
 
     private static void record(long now) {
         if (now >= nextUpdate) {
@@ -81,6 +87,7 @@ final class FrameTelemetryRuntime {
             recommendation = RECOMMENDATIONS.evaluate(latest, profile, now);
             plan = QualityAdjustmentPlanner.plan(profile, recommendation.recommendation());
             ACTIONABLE.observe(recommendation, profile, now, System.currentTimeMillis());
+            BENCHMARK.update(latest, now, System.currentTimeMillis());
             nextUpdate = now + UPDATE_INTERVAL_NANOS;
         }
     }
@@ -92,6 +99,7 @@ final class FrameTelemetryRuntime {
         recommendation = RecommendationResult.hold(RecommendationReason.WARMING_UP);
         plan = QualityAdjustmentPlanner.plan(profile, recommendation.recommendation());
         ACTIONABLE.resetContext();
+        BENCHMARK.cancel();
         nextUpdate = now + UPDATE_INTERVAL_NANOS;
     }
 
