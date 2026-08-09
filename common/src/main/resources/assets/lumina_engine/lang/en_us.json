@@ -27,5 +27,12 @@
   "lumina_engine.profile.balanced": "Balanced",
   "lumina_engine.profile.quality": "Quality",
   "lumina_engine.profile.cinematic": "Cinematic",
-  "lumina_engine.profile.custom": "Custom"
+  "lumina_engine.profile.custom": "Custom",
+  "lumina_engine.telemetry.average_fps": "Average FPS: %s",
+  "lumina_engine.telemetry.stable_minimum_fps": "Stable minimum FPS: %s",
+  "lumina_engine.telemetry.one_percent_low": "1%% low FPS: %s",
+  "lumina_engine.telemetry.frame_time": "Frame time: %s ms average / %s ms p95",
+  "lumina_engine.telemetry.status.warming_up": "Performance monitor: warming up (target %s FPS)",
+  "lumina_engine.telemetry.status.meeting_target": "Performance monitor: meeting %s FPS target",
+  "lumina_engine.telemetry.status.below_target": "Performance monitor: below %s FPS target"
 }

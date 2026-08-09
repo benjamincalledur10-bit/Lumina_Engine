@@ -15,6 +15,7 @@ import dev.lumina.engine.common.LuminaConfig;
 import dev.lumina.engine.common.ModStatus;
 import dev.lumina.engine.common.QualityProfile;
 import dev.lumina.engine.common.iris.IrisStatus;
+import dev.lumina.engine.common.telemetry.FrameTimeSnapshot;
 import java.io.IOException;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -79,6 +80,13 @@ final class LuminaControlCenterScreen {
 
         ConfigCategory.Builder diagnostics = ConfigCategory.createBuilder()
             .name(Text.translatable("lumina_engine.category.diagnostics"));
+        FrameTimeSnapshot metrics = FrameTelemetryRuntime.latest();
+        diagnostics
+            .option(LabelOption.create(telemetryStatusText(metrics)))
+            .option(LabelOption.create(Text.translatable("lumina_engine.telemetry.average_fps", format(metrics.averageFps()))))
+            .option(LabelOption.create(Text.translatable("lumina_engine.telemetry.stable_minimum_fps", format(metrics.stableMinimumFps()))))
+            .option(LabelOption.create(Text.translatable("lumina_engine.telemetry.one_percent_low", format(metrics.onePercentLowFps()))))
+            .option(LabelOption.create(Text.translatable("lumina_engine.telemetry.frame_time", format(metrics.averageFrameTimeMillis()), format(metrics.p95FrameTimeMillis()))));
         for (ModStatus status : session.diagnostics().mods()) {
             if (!"iris".equals(status.id())) {
                 diagnostics.option(LabelOption.create(diagnosticText(status)));
@@ -121,10 +129,17 @@ final class LuminaControlCenterScreen {
     private static void save(ControlCenterSession session) {
         try {
             session.save();
+            FrameTelemetryRuntime.setTargetFps(session.targetFps());
         } catch (IOException exception) {
             LOGGER.error("Could not save Lumina Engine configuration", exception);
         }
     }
+
+    private static Text telemetryStatusText(FrameTimeSnapshot snapshot) {
+        return Text.translatable("lumina_engine.telemetry.status." + snapshot.targetStatus().name().toLowerCase(java.util.Locale.ROOT), snapshot.targetFps());
+    }
+
+    private static String format(double value) { return String.format(java.util.Locale.ROOT, "%.1f", value); }
 
     private static Text diagnosticText(ModStatus status) {
         return status.installed()

@@ -2,6 +2,7 @@ package dev.lumina.engine.fabric.v26_2;
 
 import dev.lumina.engine.common.ConfigStore;
 import dev.lumina.engine.common.Diagnostics;
+import dev.lumina.engine.common.LuminaConfig;
 import java.io.IOException;
 import net.fabricmc.api.ClientModInitializer;
 import org.slf4j.Logger;
@@ -15,9 +16,11 @@ public final class LuminaEngineClient implements ClientModInitializer {
     public void onInitializeClient() {
         FabricPlatformAdapter platform = new FabricPlatformAdapter();
         ConfigStore configStore = new ConfigStore(platform.configDirectory().resolve(MOD_ID + ".json"));
+        int targetFps = LuminaConfig.DEFAULT_TARGET_FPS;
 
         try {
             ConfigStore.LoadResult result = configStore.load();
+            targetFps = result.config().targetFps();
             if (result.recoveredFromCorruption()) {
                 LOGGER.warn("Recovered corrupt configuration; backup saved to {}", result.corruptBackup());
             }
@@ -30,6 +33,8 @@ public final class LuminaEngineClient implements ClientModInitializer {
         } catch (IOException exception) {
             LOGGER.error("Could not load Lumina Engine configuration; using in-memory defaults", exception);
         }
+
+        FrameTelemetryRuntime.initialize(targetFps);
 
         Diagnostics.inspect(platform).mods().forEach(status ->
             LOGGER.info("Dependency diagnostic: {} ({})", status.displayName(), status.version())
