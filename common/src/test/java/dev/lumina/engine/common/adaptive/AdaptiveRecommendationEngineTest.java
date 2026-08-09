@@ -29,6 +29,18 @@ class AdaptiveRecommendationEngineTest {
         FrameTimeSnapshot invalid = new FrameTimeSnapshot(100, 60, Double.NaN, 50, 16, 20, 60, TargetStatus.MEETING_TARGET);
         assertReason(RecommendationReason.WARMING_UP, engine.evaluate(invalid, QualityProfile.BALANCED, 0));
     }
+    @Test void contextResetPreventsInheritedStreakRecommendation() {
+        evaluate(50, QualityProfile.BALANCED, 0);
+        evaluate(50, QualityProfile.BALANCED, 1);
+        engine.onContextChanged();
+        assertReason(RecommendationReason.OBSERVING_LOW_PERFORMANCE, evaluate(50, QualityProfile.BALANCED, 2));
+    }
+    @Test void targetChangePreventsPrematureRecommendation() {
+        evaluate(50, QualityProfile.BALANCED, 0);
+        evaluate(50, QualityProfile.BALANCED, 1);
+        engine.onTargetChanged();
+        assertReason(RecommendationReason.OBSERVING_LOW_PERFORMANCE, evaluate(50, QualityProfile.BALANCED, 2));
+    }
 
     private void lowerAt(long now) { evaluate(50,QualityProfile.BALANCED,now); evaluate(50,QualityProfile.BALANCED,now); evaluate(50,QualityProfile.BALANCED,now); }
     private void raiseAt(long now) { for(int i=0;i<10;i++) evaluate(70,QualityProfile.BALANCED,now); }

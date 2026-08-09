@@ -56,6 +56,10 @@ public final class AdaptiveRecommendationEngine {
 
     public void resetObservations() { resetCounters(); }
 
+    public void onTargetChanged() { resetObservations(); }
+
+    public void onContextChanged() { resetObservations(); }
+
     private static boolean valid(FrameTimeSnapshot snapshot) {
         return snapshot != null
             && snapshot.targetStatus() != TargetStatus.WARMING_UP

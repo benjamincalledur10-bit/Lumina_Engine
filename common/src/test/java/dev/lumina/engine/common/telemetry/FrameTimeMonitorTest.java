@@ -43,4 +43,13 @@ class FrameTimeMonitorTest {
         assertEquals(TargetStatus.BELOW_TARGET, monitor.snapshot(60).targetStatus());
         assertEquals(TargetStatus.MEETING_TARGET, monitor.snapshot(30).targetStatus());
     }
+
+    @Test void resetDiscardsInheritedFrameData() {
+        FrameTimeMonitor monitor = new FrameTimeMonitor(4, 0, 1_000_000_000L);
+        monitor.recordFrame(0);
+        monitor.recordFrame(10_000_000);
+        monitor.reset();
+        assertEquals(0, monitor.sampleCount());
+        assertEquals(TargetStatus.WARMING_UP, monitor.snapshot(60).targetStatus());
+    }
 }

@@ -31,28 +31,47 @@ final class FrameTelemetryRuntime {
             Object world = Minecraft.getInstance().level;
             if (world != lastWorld) {
                 lastWorld = world;
-                MONITOR.reset();
-                RECOMMENDATIONS.resetObservations();
+                resetContext(System.nanoTime());
+                return;
             }
             record(System.nanoTime());
         });
     }
 
-    static void setTargetFps(int value) { targetFps = value; latest = MONITOR.snapshot(value); }
+    static void setTargetFps(int value) {
+        targetFps = value;
+        RECOMMENDATIONS.onTargetChanged();
+        latest = MONITOR.snapshot(value);
+        recommendation = RecommendationResult.hold(RecommendationReason.WARMING_UP);
+    }
     static void setProfile(QualityProfile value) { profile = value; RECOMMENDATIONS.resetObservations(); }
     static FrameTimeSnapshot latest() { return latest; }
     static RecommendationResult recommendation() { return recommendation; }
 
     private static void record(long now) {
+        if (now >= nextUpdate) {
+            String irisState = irisState();
+            if (lastIrisState != null && !lastIrisState.equals(irisState)) {
+                lastIrisState = irisState;
+                resetContext(now);
+                return;
+            }
+            lastIrisState = irisState;
+        }
         MONITOR.recordFrame(now);
         if (now >= nextUpdate) {
             latest = MONITOR.snapshot(targetFps);
-            String irisState = irisState();
-            if (lastIrisState != null && !lastIrisState.equals(irisState)) RECOMMENDATIONS.resetObservations();
-            lastIrisState = irisState;
             recommendation = RECOMMENDATIONS.evaluate(latest, profile, now);
             nextUpdate = now + UPDATE_INTERVAL_NANOS;
         }
+    }
+
+    private static void resetContext(long now) {
+        MONITOR.reset();
+        RECOMMENDATIONS.onContextChanged();
+        latest = FrameTimeSnapshot.warmingUp(0, targetFps);
+        recommendation = RecommendationResult.hold(RecommendationReason.WARMING_UP);
+        nextUpdate = now + UPDATE_INTERVAL_NANOS;
     }
 
     private static String irisState() {
