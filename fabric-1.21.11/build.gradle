@@ -24,6 +24,7 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_1_21_11}"
     modImplementation "dev.isxander:yet-another-config-lib:${yacl_1_21_11}"
     modCompileOnly "com.terraformersmc:modmenu:${modmenu_1_21_11}"
+    modCompileOnly("maven.modrinth:iris:${iris_1_21_11}") { transitive = false }
     clientImplementation project(':common')
 }
 

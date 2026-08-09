@@ -89,12 +89,19 @@ screen. The Control Center currently provides:
 - a selector for all five quality profiles;
 - a target FPS slider from 30 to 240;
 - save, cancel, per-option reset, and complete default restoration behavior;
-- a read-only diagnostics category with detected dependency versions; and
+- a read-only diagnostics category with detected dependency versions;
+- read-only Iris state showing whether shaders are loaded and whether a shader
+  pack is actively compiled and in use;
+- a button that opens Iris's public shader-pack screen when Iris is installed;
 - English and Spanish translations selected by Minecraft's language setting.
 
 Adaptive optimization is visible but deliberately unavailable. The values saved
 by this screen are configuration targets only: they do not modify Minecraft,
 Iris, Sodium, or shader settings yet.
+
+The Iris bridge uses only `net.irisshaders.iris.api.v0`. It is loaded lazily,
+so Iris remains optional, and it deliberately does not inspect Iris internals,
+shader-pack files, or the selected pack's name.
 
 ## Build and test
 
@@ -124,9 +131,9 @@ temporary file and an atomic move whenever the filesystem supports it.
 
 ## Roadmap boundaries
 
-YACL screens, automatic option changes, benchmarking, shader uniforms, direct
-shader integration, frame-time measurement, and adaptive FPS control are not
-part of this initial foundation. Future integrations must use stable APIs or an
+Automatic option changes, benchmarking, shader uniforms, direct shader
+integration, frame-time measurement, and adaptive FPS control are not part of
+the current implementation. Future integrations must use stable APIs or an
 isolated compatibility layer—never copied internals or fragile private hooks.
 
 ## Contributing

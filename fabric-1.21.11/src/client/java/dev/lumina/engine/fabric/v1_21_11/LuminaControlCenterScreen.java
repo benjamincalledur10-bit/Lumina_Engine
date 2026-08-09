@@ -14,6 +14,7 @@ import dev.lumina.engine.common.ControlCenterSession;
 import dev.lumina.engine.common.LuminaConfig;
 import dev.lumina.engine.common.ModStatus;
 import dev.lumina.engine.common.QualityProfile;
+import dev.lumina.engine.common.iris.IrisStatus;
 import java.io.IOException;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -27,6 +28,8 @@ final class LuminaControlCenterScreen {
 
     static Screen create(Screen parent) {
         FabricPlatformAdapter platform = new FabricPlatformAdapter();
+        IrisIntegration iris = new IrisIntegration(platform);
+        IrisStatus irisStatus = iris.status();
         ConfigStore store = new ConfigStore(platform.configDirectory().resolve(LuminaEngineClient.MOD_ID + ".json"));
         ControlCenterSession session;
         try {
@@ -77,8 +80,27 @@ final class LuminaControlCenterScreen {
         ConfigCategory.Builder diagnostics = ConfigCategory.createBuilder()
             .name(Text.translatable("lumina_engine.category.diagnostics"));
         for (ModStatus status : session.diagnostics().mods()) {
-            diagnostics.option(LabelOption.create(diagnosticText(status)));
+            if (!"iris".equals(status.id())) {
+                diagnostics.option(LabelOption.create(diagnosticText(status)));
+            }
         }
+        diagnostics
+            .option(LabelOption.create(irisInstalledText(irisStatus)))
+            .option(LabelOption.create(Text.translatable(
+                "lumina_engine.iris.shaders_enabled",
+                booleanText(irisStatus.shadersEnabled())
+            )))
+            .option(LabelOption.create(Text.translatable(
+                "lumina_engine.iris.shader_active",
+                booleanText(irisStatus.shaderActive())
+            )))
+            .option(ButtonOption.createBuilder()
+                .name(Text.translatable("lumina_engine.iris.open"))
+                .description(OptionDescription.of(Text.translatable("lumina_engine.iris.open.description")))
+                .text(Text.translatable("lumina_engine.action.open_iris"))
+                .available(irisStatus.installed())
+                .action((screen, option) -> iris.openShaderScreen(screen))
+                .build());
 
         ControlCenterSession finalSession = session;
         return YetAnotherConfigLib.createBuilder()
@@ -108,6 +130,16 @@ final class LuminaControlCenterScreen {
         return status.installed()
             ? Text.translatable("lumina_engine.diagnostic.installed", status.displayName(), status.version())
             : Text.translatable("lumina_engine.diagnostic.missing", status.displayName());
+    }
+
+    private static Text irisInstalledText(IrisStatus status) {
+        return status.installed()
+            ? Text.translatable("lumina_engine.iris.installed", status.version())
+            : Text.translatable("lumina_engine.iris.missing");
+    }
+
+    private static Text booleanText(boolean value) {
+        return Text.translatable(value ? "lumina_engine.value.yes" : "lumina_engine.value.no");
     }
 
     private static String profileTranslationKey(QualityProfile profile) {
