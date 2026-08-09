@@ -17,6 +17,8 @@ import dev.lumina.engine.common.QualityProfile;
 import dev.lumina.engine.common.iris.IrisStatus;
 import dev.lumina.engine.common.telemetry.FrameTimeSnapshot;
 import dev.lumina.engine.common.adaptive.RecommendationResult;
+import dev.lumina.engine.common.adaptive.QualityAdjustmentPlan;
+import dev.lumina.engine.common.adaptive.PlannedAdjustment;
 import java.io.IOException;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -83,14 +85,19 @@ final class LuminaControlCenterScreen {
             .name(Component.translatable("lumina_engine.category.diagnostics"));
         FrameTimeSnapshot metrics = FrameTelemetryRuntime.latest();
         RecommendationResult recommendation = FrameTelemetryRuntime.recommendation();
+        QualityAdjustmentPlan plan = FrameTelemetryRuntime.plan();
         diagnostics
             .option(LabelOption.create(Component.translatable("lumina_engine.recommendation", recommendationText(recommendation))))
             .option(LabelOption.create(Component.translatable("lumina_engine.recommendation.reason", reasonText(recommendation))))
+            .option(LabelOption.create(planText(plan)))
             .option(LabelOption.create(telemetryStatusText(metrics)))
             .option(LabelOption.create(Component.translatable("lumina_engine.telemetry.average_fps", format(metrics.averageFps()))))
             .option(LabelOption.create(Component.translatable("lumina_engine.telemetry.stable_minimum_fps", format(metrics.stableMinimumFps()))))
             .option(LabelOption.create(Component.translatable("lumina_engine.telemetry.one_percent_low", format(metrics.onePercentLowFps()))))
             .option(LabelOption.create(Component.translatable("lumina_engine.telemetry.frame_time", format(metrics.averageFrameTimeMillis()), format(metrics.p95FrameTimeMillis()))));
+        for (PlannedAdjustment adjustment : plan.adjustments()) {
+            diagnostics.option(LabelOption.create(adjustmentText(adjustment)));
+        }
         for (ModStatus status : session.diagnostics().mods()) {
             if (!"iris".equals(status.id())) {
                 diagnostics.option(LabelOption.create(diagnosticText(status)));
@@ -152,6 +159,18 @@ final class LuminaControlCenterScreen {
 
     private static Component reasonText(RecommendationResult result) {
         return Component.translatable("lumina_engine.recommendation.reason." + result.reason().name().toLowerCase(java.util.Locale.ROOT));
+    }
+
+    private static Component planText(QualityAdjustmentPlan plan) {
+        return plan.changesQuality()
+            ? Component.translatable("lumina_engine.plan.transition", Component.translatable(profileTranslationKey(plan.currentProfile())), Component.translatable(profileTranslationKey(plan.suggestedProfile())))
+            : Component.translatable("lumina_engine.plan.no_changes");
+    }
+
+    private static Component adjustmentText(PlannedAdjustment adjustment) {
+        return Component.translatable("lumina_engine.plan.adjustment",
+            Component.translatable("lumina_engine.plan.domain." + adjustment.domain().name().toLowerCase(java.util.Locale.ROOT)),
+            Component.translatable("lumina_engine.plan.direction." + adjustment.direction().name().toLowerCase(java.util.Locale.ROOT)));
     }
 
     private static Component diagnosticText(ModStatus status) {

@@ -49,5 +49,14 @@
   "lumina_engine.recommendation.reason.cooldown": "Waiting for the recommendation cooldown",
   "lumina_engine.recommendation.reason.quality_floor": "Performance is already the lowest quality profile",
   "lumina_engine.recommendation.reason.quality_ceiling": "Cinematic is already the highest quality profile",
-  "lumina_engine.recommendation.reason.custom_profile": "Custom profiles are not changed by recommendations"
+  "lumina_engine.recommendation.reason.custom_profile": "Custom profiles are not changed by recommendations",
+  "lumina_engine.plan.transition": "Preview only: %s → %s",
+  "lumina_engine.plan.no_changes": "Preview only: no quality changes suggested",
+  "lumina_engine.plan.adjustment": "Planned: %s — %s",
+  "lumina_engine.plan.direction.increase": "increase",
+  "lumina_engine.plan.direction.decrease": "decrease",
+  "lumina_engine.plan.domain.shader_quality": "shader quality",
+  "lumina_engine.plan.domain.shadow_quality": "shadow quality",
+  "lumina_engine.plan.domain.lighting_effects": "lighting effects",
+  "lumina_engine.plan.domain.distant_horizons_quality": "Distant Horizons quality"
 }

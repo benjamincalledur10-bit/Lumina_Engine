@@ -17,6 +17,8 @@ import dev.lumina.engine.common.QualityProfile;
 import dev.lumina.engine.common.iris.IrisStatus;
 import dev.lumina.engine.common.telemetry.FrameTimeSnapshot;
 import dev.lumina.engine.common.adaptive.RecommendationResult;
+import dev.lumina.engine.common.adaptive.QualityAdjustmentPlan;
+import dev.lumina.engine.common.adaptive.PlannedAdjustment;
 import java.io.IOException;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -83,14 +85,19 @@ final class LuminaControlCenterScreen {
             .name(Text.translatable("lumina_engine.category.diagnostics"));
         FrameTimeSnapshot metrics = FrameTelemetryRuntime.latest();
         RecommendationResult recommendation = FrameTelemetryRuntime.recommendation();
+        QualityAdjustmentPlan plan = FrameTelemetryRuntime.plan();
         diagnostics
             .option(LabelOption.create(Text.translatable("lumina_engine.recommendation", recommendationText(recommendation))))
             .option(LabelOption.create(Text.translatable("lumina_engine.recommendation.reason", reasonText(recommendation))))
+            .option(LabelOption.create(planText(plan)))
             .option(LabelOption.create(telemetryStatusText(metrics)))
             .option(LabelOption.create(Text.translatable("lumina_engine.telemetry.average_fps", format(metrics.averageFps()))))
             .option(LabelOption.create(Text.translatable("lumina_engine.telemetry.stable_minimum_fps", format(metrics.stableMinimumFps()))))
             .option(LabelOption.create(Text.translatable("lumina_engine.telemetry.one_percent_low", format(metrics.onePercentLowFps()))))
             .option(LabelOption.create(Text.translatable("lumina_engine.telemetry.frame_time", format(metrics.averageFrameTimeMillis()), format(metrics.p95FrameTimeMillis()))));
+        for (PlannedAdjustment adjustment : plan.adjustments()) {
+            diagnostics.option(LabelOption.create(adjustmentText(adjustment)));
+        }
         for (ModStatus status : session.diagnostics().mods()) {
             if (!"iris".equals(status.id())) {
                 diagnostics.option(LabelOption.create(diagnosticText(status)));
@@ -152,6 +159,18 @@ final class LuminaControlCenterScreen {
 
     private static Text reasonText(RecommendationResult result) {
         return Text.translatable("lumina_engine.recommendation.reason." + result.reason().name().toLowerCase(java.util.Locale.ROOT));
+    }
+
+    private static Text planText(QualityAdjustmentPlan plan) {
+        return plan.changesQuality()
+            ? Text.translatable("lumina_engine.plan.transition", Text.translatable(profileTranslationKey(plan.currentProfile())), Text.translatable(profileTranslationKey(plan.suggestedProfile())))
+            : Text.translatable("lumina_engine.plan.no_changes");
+    }
+
+    private static Text adjustmentText(PlannedAdjustment adjustment) {
+        return Text.translatable("lumina_engine.plan.adjustment",
+            Text.translatable("lumina_engine.plan.domain." + adjustment.domain().name().toLowerCase(java.util.Locale.ROOT)),
+            Text.translatable("lumina_engine.plan.direction." + adjustment.direction().name().toLowerCase(java.util.Locale.ROOT)));
     }
 
     private static Text diagnosticText(ModStatus status) {
