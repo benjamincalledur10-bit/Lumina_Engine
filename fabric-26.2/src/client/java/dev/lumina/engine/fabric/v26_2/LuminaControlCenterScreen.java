@@ -19,6 +19,8 @@ import dev.lumina.engine.common.telemetry.FrameTimeSnapshot;
 import dev.lumina.engine.common.benchmark.BenchmarkResult;
 import dev.lumina.engine.common.benchmark.BenchmarkSnapshot;
 import dev.lumina.engine.common.benchmark.BenchmarkComparison;
+import dev.lumina.engine.common.compat.CompatibilityAdvisor;
+import dev.lumina.engine.common.compat.CompatibilityAssessment;
 import dev.lumina.engine.common.adaptive.RecommendationResult;
 import dev.lumina.engine.common.adaptive.ActionableRecommendation;
 import dev.lumina.engine.common.adaptive.QualityAdjustmentPlan;
@@ -58,6 +60,8 @@ final class LuminaControlCenterScreen {
         FabricPlatformAdapter platform = new FabricPlatformAdapter();
         IrisIntegration iris = new IrisIntegration(platform);
         IrisStatus irisStatus = iris.status();
+        CompatibilityAssessment compatibility = CompatibilityAdvisor.assess("26.2",
+            modVersion(session, "iris"), modVersion(session, "sodium"));
 
         Option<QualityProfile> profile = Option.<QualityProfile>createBuilder()
             .name(Component.translatable("lumina_engine.option.profile"))
@@ -180,6 +184,10 @@ final class LuminaControlCenterScreen {
             }
         }
         diagnostics
+            .option(LabelOption.create(Component.translatable("lumina_engine.compatibility.status",
+                Component.translatable("lumina_engine.compatibility." + compatibility.level().name().toLowerCase(java.util.Locale.ROOT)))))
+            .option(LabelOption.create(Component.translatable("lumina_engine.compatibility.expected",
+                compatibility.expectedIris(), compatibility.expectedSodium())))
             .option(LabelOption.create(irisInstalledText(irisStatus)))
             .option(LabelOption.create(Component.translatable(
                 "lumina_engine.iris.shaders_enabled",
@@ -268,6 +276,11 @@ final class LuminaControlCenterScreen {
         return status.installed()
             ? Component.translatable("lumina_engine.diagnostic.installed", status.displayName(), status.version())
             : Component.translatable("lumina_engine.diagnostic.missing", status.displayName());
+    }
+
+    private static String modVersion(ControlCenterSession session, String id) {
+        return session.diagnostics().mods().stream().filter(mod -> id.equals(mod.id()))
+            .filter(ModStatus::installed).map(ModStatus::version).findFirst().orElse(null);
     }
 
     private static Component irisInstalledText(IrisStatus status) {
