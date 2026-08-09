@@ -44,5 +44,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lumina-engine-${{ matrix.minecraft }}
-          path: ${{ matrix.project }}/build/libs/*.jar
+          path: |
+            ${{ matrix.project }}/build/libs/*.jar
+            !${{ matrix.project }}/build/libs/*-sources.jar
+            !${{ matrix.project }}/build/libs/*-dev.jar
           if-no-files-found: error
